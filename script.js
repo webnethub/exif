@@ -12,13 +12,17 @@ function handleFiles(event) {
             img.src = URL.createObjectURL(file);
             img.onload = function() {
                 URL.revokeObjectURL(this.src);
-                const metadata = `
-                    <p>Name: ${file.name}</p>
-                    <p>Size: ${file.size} bytes</p>
-                    <p>Dimensions: ${this.width} x ${this.height}</p>
-                    <!-- Additional metadata can be accessed here -->
-                `;
-                metadataDiv.innerHTML += metadata;
+                getExifData(file, function(exifData) {
+                    const metadata = `
+                        <p>Name: ${file.name}</p>
+                        <p>Size: ${file.size} bytes</p>
+                        <p>Dimensions: ${this.width} x ${this.height}</p>
+                        <p>Date Taken: ${exifData.DateTime}</p>
+                        <p>GPS Coordinates: ${exifData.GPSLatitude}, ${exifData.GPSLongitude}</p>
+                        <!-- Additional metadata can be accessed here -->
+                    `;
+                    metadataDiv.innerHTML += metadata;
+                });
             };
             metadataDiv.appendChild(img);
         } else if (file.type.startsWith('video/')) {
@@ -41,4 +45,13 @@ function handleFiles(event) {
 
         metadataDiv.appendChild(document.createElement('hr'));
     }
+}
+
+function getExifData(file, callback) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const exif = EXIF.readFromBinaryFile(new BinaryFile(event.target.result));
+        callback(exif);
+    };
+    reader.readAsBinaryString(file);
 }
