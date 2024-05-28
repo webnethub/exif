@@ -14,16 +14,19 @@ function handleFiles(event) {
                 URL.revokeObjectURL(this.src);
                 getExifData(file, function(exifData) {
                     const metadata = `
-                        <p>Name: ${file.name}</p>
-                        <p>Size: ${file.size} bytes</p>
-                        <p>Dimensions: ${this.width} x ${this.height}</p>
-                        <p>Creation Time: ${exifData.DateTimeOriginal}</p>
-                        <p>GPS Coordinates: ${exifData.GPSLatitude}, ${exifData.GPSLongitude}</p>
-                        <!-- Additional metadata can be accessed here -->
+                        <div class="metadata-item">
+                            <p>Name: ${file.name}</p>
+                            <p>Size: ${file.size} bytes</p>
+                            <p>Dimensions: ${this.width} x ${this.height}</p>
+                            <p>Creation Time: ${exifData.DateTimeOriginal}</p>
+                            <p>GPS Coordinates: ${exifData.GPSLatitude}, ${exifData.GPSLongitude}</p>
+                            <!-- Additional metadata can be accessed here -->
+                        </div>
                     `;
                     metadataDiv.innerHTML += metadata;
                 });
             };
+            metadataDiv.appendChild(img);
         } else if (file.type.startsWith('video/')) {
             const video = document.createElement('video');
             video.src = URL.createObjectURL(file);
@@ -31,14 +34,17 @@ function handleFiles(event) {
             video.onloadedmetadata = function() {
                 URL.revokeObjectURL(this.src);
                 const metadata = `
-                    <p>Name: ${file.name}</p>
-                    <p>Size: ${file.size} bytes</p>
-                    <p>Duration: ${this.duration.toFixed(2)} seconds</p>
-                    <p>Dimensions: ${this.videoWidth} x ${this.videoHeight}</p>
-                    <!-- Additional metadata can be accessed here -->
+                    <div class="metadata-item">
+                        <p>Name: ${file.name}</p>
+                        <p>Size: ${file.size} bytes</p>
+                        <p>Duration: ${this.duration.toFixed(2)} seconds</p>
+                        <p>Dimensions: ${this.videoWidth} x ${this.videoHeight}</p>
+                        <!-- Additional metadata can be accessed here -->
+                    </div>
                 `;
                 metadataDiv.innerHTML += metadata;
             };
+            metadataDiv.appendChild(video);
         }
 
         metadataDiv.appendChild(document.createElement('hr'));
