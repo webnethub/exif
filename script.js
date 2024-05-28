@@ -18,29 +18,13 @@ function handleFiles(event) {
                         <p>Size: ${file.size} bytes</p>
                         <p>Dimensions: ${this.width} x ${this.height}</p>
                         <p>Date Taken: ${exifData.DateTime}</p>
-                        <p>GPS Coordinates: ${exifData.GPSLatitude}, ${exifData.GPSLongitude}</p>
+                        <p>GPS Coordinates: ${formatGps(exifData)}</p>
                         <!-- Additional metadata can be accessed here -->
                     `;
                     metadataDiv.innerHTML += metadata;
                 });
             };
             metadataDiv.appendChild(img);
-        } else if (file.type.startsWith('video/')) {
-            const video = document.createElement('video');
-            video.src = URL.createObjectURL(file);
-            video.preload = 'metadata';
-            video.onloadedmetadata = function() {
-                URL.revokeObjectURL(this.src);
-                const metadata = `
-                    <p>Name: ${file.name}</p>
-                    <p>Size: ${file.size} bytes</p>
-                    <p>Duration: ${this.duration.toFixed(2)} seconds</p>
-                    <p>Dimensions: ${this.videoWidth} x ${this.videoHeight}</p>
-                    <!-- Additional metadata can be accessed here -->
-                `;
-                metadataDiv.innerHTML += metadata;
-            };
-            metadataDiv.appendChild(video);
         }
 
         metadataDiv.appendChild(document.createElement('hr'));
@@ -54,4 +38,27 @@ function getExifData(file, callback) {
         callback(exif);
     };
     reader.readAsBinaryString(file);
+}
+
+function formatGps(exifData) {
+    if (!exifData || !exifData.GPSLatitude || !exifData.GPSLongitude) {
+        return 'N/A';
+    }
+    
+    const latRef = exifData.GPSLatitudeRef || 'N';
+    const lonRef = exifData.GPSLongitudeRef || 'E';
+    
+    const lat = convertCoordinate(exifData.GPSLatitude, latRef);
+    const lon = convertCoordinate(exifData.GPSLongitude, lonRef);
+    
+    return `${lat} ${latRef}, ${lon} ${lonRef}`;
+}
+
+function convertCoordinate(coord, ref) {
+    const [degrees, minutes, seconds] = coord;
+    let decimal = degrees + (minutes / 60) + (seconds / 3600);
+    if (ref === 'S' || ref === 'W') {
+        decimal = -decimal;
+    }
+    return decimal.toFixed(6);
 }
