@@ -1,0 +1,16 @@
+/* styles.css */
+
+/* Style for the file input */
+input[type="file"] {
+    margin-bottom: 10px;
+}
+
+/* Style for the metadata */
+#metadata {
+    margin-top: 20px;
+}
+
+/* Style for individual metadata items */
+.metadata-item {
+    margin-bottom: 10px;
+}
